@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+
 
 public class Person 
 {
 
 	private String name;
 	private String preArranged;
-	private String[] preferences = new String[10];
+	private ArrayList<String> preferences = new ArrayList<String>();
 	
 	public void setName(String input)
 	{
@@ -26,17 +28,17 @@ public class Person
 		return this.preArranged;
 	}
 	
-	public void addPref(String input, int index)			// maybe int value for preference number
+	public void addPref(String input)			// maybe int value for preference number
 	{
-		this.preferences[index] = input;
+		this.preferences.add(input);
 	}
 	
 	public String getPrefs()
 	{
-		String s = preferences[0];
-		for(int i = 1; i < preferences.length; i++)
+		String s = preferences.get(0);
+		for(int i = 1; i < preferences.size(); i++)
 		{
-			s += " " + preferences[i] + ",";
+			s += " " + preferences.get(i) + ",";
 		}
 		return s;
 	}
@@ -52,7 +54,7 @@ public class Person
 		Person test = new Person();
 		test.setName("Conor");
 		test.setPreArranged("No");
-		test.addPref("Project 1", 1);
+		test.addPref("Project 1");
 		
 		System.out.println(test);
 		
