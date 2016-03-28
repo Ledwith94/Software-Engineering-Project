@@ -4,19 +4,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Random;
 
 public class PreferenceTable
 {
-	public static ArrayList<String> choices = new ArrayList<String>();
-		
-	static StudentEntry[] group = new StudentEntry[52];										// for 51 students and the top line 
-	static Hashtable<String, StudentEntry> table = new Hashtable<String, StudentEntry>();	// hashtable for names and student entries
+	private  Random RND = new Random();
 	
+	public  ArrayList<String> choices = new ArrayList<String>();
+	public  ArrayList<String> preArrangedChoices = new ArrayList<String>();
+		
+	 StudentEntry[] students = new StudentEntry[52];									// for 51 students and the top line 
+	 Hashtable<String, StudentEntry> table = new Hashtable<String, StudentEntry>();		// hashtable for names and student entries
 
-	private static void loadContentFromFile(String filePath) throws IOException
+	public  PreferenceTable(String filePath) throws IOException
 	{
 		File file = new File(filePath);											// set file path from inputted String
-		int g = 0;
+		int g = 0;																// students iterator 
 			
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) 		// BufferedReader to read each line by line
 		{
@@ -24,11 +27,7 @@ public class PreferenceTable
 		    int i = 0;
 		    int a = 0;
 		    while ((line = br.readLine()) != null) 									// until EOF
-			{
-		    	if (a == 0)
-    			{
-		    																		// do nothing for the top line 
-    			}
+			{	if (a == 0){}														// do nothing for the top line
 		    	
 		    	else
 		    	{
@@ -41,103 +40,88 @@ public class PreferenceTable
 			    	add.setName(tokens[0]);											// add name to StudentEntry
 			    	add.setPreArranged(tokens[1]);									// add pre-arranged value to StudentEntry
 			    	
-			    	for(i = 0; i < l; i++)											// for all of the tokens 
+			    	if(add.getPreArranged())										// if someone has a prearranged choice
+			    		{preArrangedChoices.add(tokens[2]);							// store choice in prearranges arraylist
+			    		 add.addPref(tokens[2]);}
+			    	
+			    	else															// else store in other choices arraylist
 			    	{
-			    		if(i > 1)													// add preferences to preference vector, when i is not 0 or 1
-			    		{
-			    			add.addPref(tokens[i]);
-			    			addToChoiceArray(tokens[i]);
-			    		}
+				    	for(i = 2; i < l; i++)										// for all of the other tokens 
+				    	{
+			    			add.addPref(tokens[i]);									// add preferences to StudentEntry object
+			    			addToChoiceArray(tokens[i]);							// add choice to choice arraylist
+				    	}
 			    	}
 			    	
 			    	add.setStatedPrefs();											// store stated preferences
 			    	
-			    	group[g] = add;													// add student to group 
+			    	students[g] = add;													// add student to students 
 			    	table.put(add.getName(), add);									// add student to hashtable
-			    	g++;
+			    	g++;															// increment students counter
 		    	}
-		    	a = 1;
+		    	a = 1;																// change a to take in all lines except first
 		    }
 		}
 	}
 		
-	public static int tokenTest(String[] tokens)
-	{
-		int amount = tokens.length;
-		return amount;																// return amount of tokens
-	}	
+	public  int tokenTest(String[] tokens)
+		{return tokens.length;}																// return amount of tokens	
 	
-	public static void addToChoiceArray(String choice)
+	public  void addToChoiceArray(String choice)
 	{
-		
-		if(choices.contains(choice))												// if choice is already there, don't add
-		{
-			// do nothing
-		}
-		
+		if(choices.contains(choice.intern()))												// if choice is already there, don't add
+		{}		// do nothing
 		else
-		{
-			choices.add(choice);
-		}
+			{choices.add(choice.intern());}
 	}
 	
-	public static ArrayList<StudentEntry> getAllStudentEntries()					// create list of all student entries
+	public  ArrayList<StudentEntry> getAllStudentEntries()					// create list of all student entries
 	{
 		ArrayList<StudentEntry> list = new ArrayList<StudentEntry>();					
 		
-		for(int i = 0; i != group.length - 1; i++)
-		{
-			list.add(group[i]);														// add to list 
-		}
+		for(int i = 0; i != students.length - 1; i++)
+			{list.add(students[i]);}													// add to list 
 		
 		return list;
 	}
 	
-	public static StudentEntry getEntryFor(String name)								// lookup hashtable and return student
+	public  StudentEntry getEntryFor(String name)								// lookup hashtable and return student
 	{
 		StudentEntry student = new StudentEntry();
 		
-		if(table.containsKey(name))													// if name in hashtable
-		{
-			student = table.get(name);												// get student 
-		}
+		if(table.containsKey(name.intern()))										// if name in hashtable
+			{student = table.get(name.intern());}									// get student 
+
 		else
-		{
-			student = null;
-		}
+			{student = null;}
 		
 		return student;
 	}
 	
-	public static void main(String[] args) throws IOException 
+	// getRandomStudent
+	public  StudentEntry getRandomStudent()
+		{return students[RND.nextInt(students.length)];}									// return a random StudentEntry
+	
+	// getRandomPreference
+	public  String getRandomPreference()										// return a random preference
+		{return choices.get(RND.nextInt(choices.size() ) );}
+	
+	// fillPreferenceOfAll(int max)
+	public  void fillPreferencesOfAll(int maxInt)
 	{
-		loadContentFromFile("src/data.tsv");
-		
-		StudentEntry test = group[0];
-		
-		System.out.println("Name: " + test.getName());
-		System.out.println("Pre-arranged: " + test.getpreArranged());
-		System.out.println("Preferences: \n" + test.getPrefs());
-		System.out.println("Stated Preferences: " + test.getStatedPrefs()+"\n");
-		
-		ArrayList<StudentEntry> list = getAllStudentEntries();
-		System.out.println(list.toString());
-		
-		StudentEntry student = getEntryFor("Richard B. Riddick");					// getStudentEntry
-		
-		if(student == null)
+		for(int i = 0; i < students.length-1; i++)										// loop through student students
 		{
-			System.out.println("Error, student entry null");
+			StudentEntry student = students[i];
+			if(student.getPreArranged() == true)									// if preArranged, do nothing
+			{} // do nothing
+			else
+			{
+				while(student.getTotalPrefs() < maxInt)									// add to preferences until 10
+				{
+					String choice = getRandomPreference();							// get random pref
+					student.addPref(choice);										// add (if not a pref already, else don't add)
+				}
+			}
 		}
-		else
-		{
-			System.out.println("\ngetEntryFor success for "+student);
-		}
-		
-		//System.out.println("\n\n Hashtable: "+table.toString());
-				
-		java.util.Collections.sort(choices);										// Alphabetize list of choices 
-		
 	}
-
-}
+ }
