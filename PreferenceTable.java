@@ -3,31 +3,35 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Random;
 
 public class PreferenceTable
 {
-	private  Random RND = new Random();
+	private Random RND = new Random();
 	
-	public  ArrayList<String> choices = new ArrayList<String>();
-	public  ArrayList<String> preArrangedChoices = new ArrayList<String>();
-		
-	 StudentEntry[] students = new StudentEntry[52];									// for 51 students and the top line 
-	 Hashtable<String, StudentEntry> table = new Hashtable<String, StudentEntry>();		// hashtable for names and student entries
+	private ArrayList<String> choices = new ArrayList<String>();
+	private ArrayList<String> preArrangedChoices = new ArrayList<String>();
+	private ArrayList<StudentEntry> students = new ArrayList<StudentEntry>();
+	private ArrayList<StudentEntry> preArrangedStudents = new ArrayList<StudentEntry>();
+	private HashMap<String, StudentEntry> table = new HashMap<String, StudentEntry>();		// hashtable for names and student entries
 
-	public  PreferenceTable(String filePath) throws IOException
+	public ArrayList<StudentEntry> getStudents()
+		{return this.students;}
+	
+	public PreferenceTable(String filePath) throws IOException
 	{
 		File file = new File(filePath);											// set file path from inputted String
-		int g = 0;																// students iterator 
 			
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) 		// BufferedReader to read each line by line
 		{
 		    String line;
 		    int i = 0;
 		    int a = 0;
+		    
 		    while ((line = br.readLine()) != null) 									// until EOF
-			{	if (a == 0){}														// do nothing for the top line
+			{	boolean preArrStud = false;
+		    	if (a == 0){}														// do nothing for the top line
 		    	
 		    	else
 		    	{
@@ -41,7 +45,8 @@ public class PreferenceTable
 			    	add.setPreArranged(tokens[1]);									// add pre-arranged value to StudentEntry
 			    	
 			    	if(add.getPreArranged())										// if someone has a prearranged choice
-			    		{preArrangedChoices.add(tokens[2]);							// store choice in prearranges arraylist
+			    		{this.preArrangedChoices.add(tokens[2]);							// store choice in prearranged arraylist
+			    		 preArrStud = true;
 			    		 add.addPref(tokens[2]);}
 			    	
 			    	else															// else store in other choices arraylist
@@ -55,42 +60,43 @@ public class PreferenceTable
 			    	
 			    	add.setStatedPrefs();											// store stated preferences
 			    	
-			    	students[g] = add;													// add student to students 
-			    	table.put(add.getName(), add);									// add student to hashtable
-			    	g++;															// increment students counter
+			    	this.students.add(add);												// add student to students
+			    	if(preArrStud)
+			    		{this.preArrangedStudents.add(add);preArrStud = false;}			// add to preArranged list, reset boolean
+			    	this.table.put(add.getName(), add);									// add student to hashtable
 		    	}
 		    	a = 1;																// change a to take in all lines except first
 		    }
 		}
 	}
 		
-	public  int tokenTest(String[] tokens)
+	public int tokenTest(String[] tokens)
 		{return tokens.length;}																// return amount of tokens	
 	
-	public  void addToChoiceArray(String choice)
+	public void addToChoiceArray(String choice)
 	{
-		if(choices.contains(choice.intern()))												// if choice is already there, don't add
-		{}		// do nothing
+		if(this.choices.contains(choice.intern()))												// if choice is already there, don't add
+			{}		// do nothing
 		else
-			{choices.add(choice.intern());}
+			{this.choices.add(choice.intern());}
 	}
 	
-	public  ArrayList<StudentEntry> getAllStudentEntries()					// create list of all student entries
+	public ArrayList<StudentEntry> getAllStudentEntries()					// create list of all student entries
 	{
 		ArrayList<StudentEntry> list = new ArrayList<StudentEntry>();					
 		
-		for(int i = 0; i != students.length - 1; i++)
-			{list.add(students[i]);}													// add to list 
+		for(int i = 0; i != this.students.size() - 1; i++)
+			{list.add(this.students.get(i));}													// add to list 
 		
 		return list;
 	}
 	
-	public  StudentEntry getEntryFor(String name)								// lookup hashtable and return student
+	public StudentEntry getEntryFor(String name)								// lookup hashtable and return student
 	{
 		StudentEntry student = new StudentEntry();
 		
-		if(table.containsKey(name.intern()))										// if name in hashtable
-			{student = table.get(name.intern());}									// get student 
+		if(this.table.containsKey(name.intern()))										// if name in hashtable
+			{student = this.table.get(name.intern());}									// get student 
 
 		else
 			{student = null;}
@@ -99,24 +105,24 @@ public class PreferenceTable
 	}
 	
 	// getRandomStudent
-	public  StudentEntry getRandomStudent()
-		{return students[RND.nextInt(students.length)];}									// return a random StudentEntry
+	public StudentEntry getRandomStudent()
+		{return this.students.get(RND.nextInt(this.students.size()));}									// return a random StudentEntry
 	
 	// getRandomPreference
-	public  String getRandomPreference()										// return a random preference
-		{return choices.get(RND.nextInt(choices.size() ) );}
+	public String getRandomPreference()										// return a random preference
+		{return this.choices.get(RND.nextInt(this.choices.size() ) );}
 	
 	// fillPreferenceOfAll(int max)
-	public  void fillPreferencesOfAll(int maxInt)
+	public void fillPreferencesOfAll(int maxInt)
 	{
-		for(int i = 0; i < students.length-1; i++)										// loop through student students
+		for(int i = 0; i < this.students.size()-1; i++)									// loop through student students
 		{
-			StudentEntry student = students[i];
+			StudentEntry student = this.students.get(i);
 			if(student.getPreArranged() == true)									// if preArranged, do nothing
-			{} // do nothing
+				{} // do nothing
 			else
 			{
-				while(student.getTotalPrefs() < maxInt)									// add to preferences until 10
+				while(student.getTotalPrefs() < maxInt)								// add to preferences until 10
 				{
 					String choice = getRandomPreference();							// get random pref
 					student.addPref(choice);										// add (if not a pref already, else don't add)
@@ -124,4 +130,7 @@ public class PreferenceTable
 			}
 		}
 	}
- }
+	
+	//  need to make a new fill preferences method that adds the less common projects 
+	
+}
