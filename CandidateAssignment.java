@@ -16,11 +16,11 @@ public class CandidateAssignment
 		 randomizeAssignment();}							// assign random assignment
 	
 	public void randomizeAssignment()
-		{if(this.oldProject != null)						// if a previous project mapping
-		 {this.oldProject = this.project;}					// save old mapping
-		  this.project = student.getRandomPreference();		// make new mapping
-		  this.index = this.student.getRanking();			// record choice index
-		  this.energy = (int) Math.pow(this.index,2);}		// save choice fitness
+		{if(this.oldProject != null)							// if a previous project mapping
+		 	{this.oldProject = this.project;}					// save old mapping
+		 this.project = this.student.getRandomPreference();			// make new mapping
+		 this.index = this.student.getRanking(this.project);	// record choice index
+		 this.energy = this.index;}								// energy = index
 	
 	public StudentEntry getStudentEntry()					// get student entry from candidate assignment
 		{return this.student;}
