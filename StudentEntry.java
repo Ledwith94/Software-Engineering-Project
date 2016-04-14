@@ -9,7 +9,6 @@ public class StudentEntry
 	private boolean preArranged;
 	private ArrayList<String> preferences = new ArrayList<String>();
 	private int statedPrefs;
-	private int ranking;
 	
 	public void setName(String input)							// set name
 		{this.name = input;}
@@ -27,36 +26,34 @@ public class StudentEntry
 		{return this.preArranged;}
 	
 	public void addPref(String input)							// check if input is in preference list already 
-		{if(hasPreference(input)){} 							// do not add to preferences if there already
-		else {this.preferences.add(input);}						// else add
+		{if(!hasPreference(input)) 								// do not add to preferences if there already
+			{this.preferences.add(input);}						// else add
 		}
 	
 	public String getPrefs()									// return preferences in a string
 		{String s = "";
-			for(int i = 0; i < preferences.size(); i++)
-				{s += (i+1) + ": " + preferences.get(i) + "\n";}
+			for(int i = 0; i < this.preferences.size(); i++)
+				{s += (i+1) + ": " + this.preferences.get(i) + "\n";}
 			return s;}
 	
 	public void setStatedPrefs()								// set stated number of preferences
-		{statedPrefs = preferences.size();}
+		{this.statedPrefs = this.preferences.size();}
 	
 	public int getStatedPrefs()									// get stated number of preferences
-		{return statedPrefs;}
+		{return this.statedPrefs;}
 	
 	public int getTotalPrefs()									// get total number of prefs
-		{return preferences.size();}
+		{return this.preferences.size();}
 	
 	public String getRandomPreference()							// return random preference
-		{if(this.getPreArranged())
-			{this.ranking = 0; return this.preferences.get(this.ranking);}
-		 this.ranking = RND.nextInt(preferences.size());		// store choice index for fitness purposes
-		 return preferences.get(this.ranking);}
+		{if(this.getPreArranged()) {return this.preferences.get(0);} // return first pref if prearranged				
+		 return this.preferences.get(RND.nextInt(this.preferences.size()));}
 	
-	public int getRanking()									// return choiceIndex
-		{return this.ranking;}
+	public int getRanking(String s)								// return choiceIndex
+		{return this.preferences.indexOf(s);}
 	
 	public boolean hasPreference(String input)					// check if has preference
-		{if(preferences.contains(input.intern()))
+		{if(this.preferences.contains(input.intern()))
 			{return true;}
 		return false;}
 	
