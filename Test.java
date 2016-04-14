@@ -1,22 +1,48 @@
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 
 public class Test {
 
-	public static void main(String[] args) throws IOException 
+	public static void main(String[] args) throws IOException, InterruptedException 
 	{
 		PreferenceTable prefs = new PreferenceTable("src/data.tsv");
 		prefs.fillPreferencesOfAll(10);
 		
-		CandidateSolution sol = new CandidateSolution();
+		CandidateSolution best = new CandidateSolution(prefs);
+		int bestScore = 1000000;
 		
-		for(int i = 0; i < prefs.students.length - 1; i++)
-			{CandidateAssignment cand = new CandidateAssignment(prefs.students[i]);
-			 sol.addAssignment(cand); System.out.println(cand);}
+		for(int j = 0; j < 100000; j++)
+		{
+			CandidateSolution sol = new CandidateSolution(prefs);
+			
+			int solutionEnergy = sol.calcTotalEnergy();
+			
+			if(solutionEnergy < bestScore)
+				{best = sol; bestScore = solutionEnergy;}
+		}
 		
-		sol.addProjAllocationEnergy();
-		System.out.println("\n\nSolution Energy = " + sol.getEnergy() + "\t\tPenalty for project collisions: " + sol.getAllocEnergy());
-		System.out.println("Fitness = " + sol.getFitness());
+		System.out.println("\nBest solution Energy = "+best.getEnergy()+"\nThis solution has "+best.getAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getAllocEnergy())+" choice energy\n");		
+		
+		SimulatedAnnealing SA = new SimulatedAnnealing();
+		
+		while(true)
+		{
+			CandidateSolution newBest = SA.anneal(best);
+		
+			System.out.println("\nBest Solution Energy generated = "+newBest.getEnergy()+"\nThis solution has "+newBest.getAllocEnergy()+" allocation energy and "+(newBest.getEnergy()-newBest.getAllocEnergy())+" choice energy\n");
+			if(newBest.getEnergy() < best.getEnergy())	{best = newBest;}
+			
+			int choice = JOptionPane.showConfirmDialog(null,
+					"Run Simulated Annealing again ?", "Do you want to run again ?", JOptionPane.YES_NO_OPTION);
+
+			if(choice == 1){break;}
+
+		}
+		
+		System.out.println("\n\n\tThe Overall Best solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getAllocEnergy())+" choice energy\n");
+		System.exit(0);
 	}
 }
 
