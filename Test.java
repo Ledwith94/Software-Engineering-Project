@@ -10,38 +10,39 @@ public class Test {
 		PreferenceTable prefs = new PreferenceTable("src/data.tsv");
 		prefs.fillPreferencesOfAll(10);
 		
-		CandidateSolution best = new CandidateSolution(prefs);
-		int bestScore = 1000000;
+		CandidateSolution best = new CandidateSolution(prefs);		// initialize solution
+		best.calcTotalEnergy();
 		
-		for(int j = 0; j < 100000; j++)
+		System.out.println("\nBest solution Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");		
+		
+		System.out.println("\n"+best.toString()+"\n");
+		
+		int choice = 0;
+		
+		while(choice != 1)
 		{
-			CandidateSolution sol = new CandidateSolution(prefs);
+			best.SimulatedAnnealing();
+		
+			System.out.println("\nBest Solution Energy generated = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
 			
-			int solutionEnergy = sol.calcTotalEnergy();
-			
-			if(solutionEnergy < bestScore)
-				{best = sol; bestScore = solutionEnergy;}
-		}
-		
-		System.out.println("\nBest solution Energy = "+best.getEnergy()+"\nThis solution has "+best.getAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getAllocEnergy())+" choice energy\n");		
-		
-		SimulatedAnnealing SA = new SimulatedAnnealing();
-		
-		while(true)
-		{
-			CandidateSolution newBest = SA.anneal(best);
-		
-			System.out.println("\nBest Solution Energy generated = "+newBest.getEnergy()+"\nThis solution has "+newBest.getAllocEnergy()+" allocation energy and "+(newBest.getEnergy()-newBest.getAllocEnergy())+" choice energy\n");
-			if(newBest.getEnergy() < best.getEnergy())	{best = newBest;}
-			
-			int choice = JOptionPane.showConfirmDialog(null,
+			choice = JOptionPane.showConfirmDialog(null,
 					"Run Simulated Annealing again ?", "Do you want to run again ?", JOptionPane.YES_NO_OPTION);
 
 			if(choice == 1){break;}
-
 		}
 		
-		System.out.println("\n\n\tThe Overall Best solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getAllocEnergy())+" choice energy\n");
+		System.out.println("\n\n\tThe resulting solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+		
+		if(best.getProjAllocEnergy() != 0)
+		{
+			choice = JOptionPane.showConfirmDialog(null,
+					"There are collisions in this solution ?", "Do you want to remove the collisions ?", JOptionPane.YES_NO_OPTION);
+	
+			if(choice == 0){System.out.println("\n\t\tRemoving Collisions\n"); best.removeCollisions();}
+		}
+		
+		System.out.println("\n\n\tThe Overall Best solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+		
 		System.exit(0);
 	}
 }
