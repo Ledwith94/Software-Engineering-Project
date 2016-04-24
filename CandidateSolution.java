@@ -179,5 +179,4 @@ public class CandidateSolution
 			{s += entry.getValue().toString();}
 		return s;
 	}
-	
 }
