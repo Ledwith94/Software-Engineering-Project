@@ -19,6 +19,12 @@ public class PreferenceTable
 	public ArrayList<StudentEntry> getStudents()
 		{return this.students;}
 	
+	public ArrayList<String> getChoices()
+		{return this.choices;}
+	
+	public ArrayList<String> getPreArrChoices()
+		{return this.preArrangedChoices;}
+	
 	public PreferenceTable(String filePath) throws IOException
 	{
 		File file = new File(filePath);											// set file path from inputted String
@@ -40,30 +46,30 @@ public class PreferenceTable
 			    	
 			    	int l = tokenTest(tokens);										// count how many tokens there are
 			    	
-			    	StudentEntry add = new StudentEntry();							// create StudentEntry object
-			    	add.setName(tokens[0]);											// add name to StudentEntry
-			    	add.setPreArranged(tokens[1]);									// add pre-arranged value to StudentEntry
+			    	StudentEntry stu = new StudentEntry();							// create StudentEntry object
+			    	stu.setName(tokens[0]);											// add name to StudentEntry
+			    	stu.setPreArranged(tokens[1]);									// add pre-arranged value to StudentEntry
 			    	
-			    	if(add.getPreArranged())										// if someone has a prearranged choice
-			    		{this.preArrangedChoices.add(tokens[2]);							// store choice in prearranged arraylist
+			    	if(stu.getPreArranged())										// if someone has a prearranged choice
+			    		{this.preArrangedChoices.add(tokens[2]);					// store choice in prearranged arraylist
 			    		 preArrStud = true;
-			    		 add.addPref(tokens[2]);}
+			    		 stu.addPref(tokens[2]);}
 			    	
 			    	else															// else store in other choices arraylist
 			    	{
 				    	for(i = 2; i < l; i++)										// for all of the other tokens 
 				    	{
-			    			add.addPref(tokens[i]);									// add preferences to StudentEntry object
+				    		stu.addPref(tokens[i]);									// add preferences to StudentEntry object
 			    			addToChoiceArray(tokens[i]);							// add choice to choice arraylist
 				    	}
 			    	}
 			    	
-			    	add.setStatedPrefs();											// store stated preferences
+			    	stu.setStatedPrefs();											// store stated preferences
 			    	
-			    	this.students.add(add);												// add student to students
+			    	this.students.add(stu);												// add student to students
 			    	if(preArrStud)
-			    		{this.preArrangedStudents.add(add);preArrStud = false;}			// add to preArranged list, reset boolean
-			    	this.table.put(add.getName(), add);									// add student to hashtable
+			    		{this.preArrangedStudents.add(stu);preArrStud = false;}			// add to preArranged list, reset boolean
+			    	this.table.put(stu.getName(), stu);									// add student to hashtable
 		    	}
 		    	a = 1;																// change a to take in all lines except first
 		    }
@@ -86,7 +92,7 @@ public class PreferenceTable
 		ArrayList<StudentEntry> list = new ArrayList<StudentEntry>();					
 		
 		for(int i = 0; i != this.students.size() - 1; i++)
-			{list.add(this.students.get(i));}													// add to list 
+			{list.add(this.students.get(i));}									// add to list 
 		
 		return list;
 	}
@@ -95,8 +101,8 @@ public class PreferenceTable
 	{
 		StudentEntry student = new StudentEntry();
 		
-		if(this.table.containsKey(name.intern()))										// if name in hashtable
-			{student = this.table.get(name.intern());}									// get student 
+		if(this.table.containsKey(name.intern()))								// if name in hashtable
+			{student = this.table.get(name.intern());}							// get student 
 
 		else
 			{student = null;}
@@ -106,31 +112,28 @@ public class PreferenceTable
 	
 	// getRandomStudent
 	public StudentEntry getRandomStudent()
-		{return this.students.get(RND.nextInt(this.students.size()));}									// return a random StudentEntry
+		{return this.students.get(RND.nextInt(this.students.size()));}			// return a random StudentEntry
 	
 	// getRandomPreference
-	public String getRandomPreference()										// return a random preference
+	public String getRandomPreference()											// return a random preference
 		{return this.choices.get(RND.nextInt(this.choices.size() ) );}
 	
 	// fillPreferenceOfAll(int max)
 	public void fillPreferencesOfAll(int maxInt)
 	{
-		for(int i = 0; i < this.students.size()-1; i++)									// loop through student students
+		for(int i = 0; i < this.students.size()-1; i++)							// loop through student students
 		{
 			StudentEntry student = this.students.get(i);
-			if(student.getPreArranged() == true)									// if preArranged, do nothing
+			if(student.getPreArranged() == true)								// if preArranged, do nothing
 				{} // do nothing
 			else
 			{
-				while(student.getTotalPrefs() < maxInt)								// add to preferences until 10
+				while(student.getTotalPrefs() < maxInt)							// add to preferences until max
 				{
-					String choice = getRandomPreference();							// get random pref
-					student.addPref(choice);										// add (if not a pref already, else don't add)
+					String choice = getRandomPreference();						// get random pref
+					student.addPref(choice);									// add (if not a pref already, else don't add)
 				}
 			}
 		}
-	}
-	
-	//  need to make a new fill preferences method that adds the less common projects 
-	
+	}	
 }
