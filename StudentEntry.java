@@ -57,6 +57,12 @@ public class StudentEntry
 			{return true;}
 		return false;}
 	
+	public int getIndexOfProject(String s)
+		{if(this.preferences.contains(s))						// if contains project
+			{return this.preferences.indexOf(s);}				// return index
+		return -1;												// else return -1
+		}
+	
 	public String toString()									// print StudentEntry object
 		{String s = "\nName: "+getName()+"\nPreArranged: "+getPreArranged()+"\nPreferences: "+getPrefs();
 		return s;}
