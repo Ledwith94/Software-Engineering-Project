@@ -1,0 +1,92 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+
+
+public class GeneticAlgorithm {
+
+	private static Random RND = new Random();
+	private ArrayList<CandidateSolution> pop = new ArrayList<CandidateSolution>();
+	private HashMap<Integer, CandidateSolution> population = new HashMap<Integer, CandidateSolution>();
+	private PreferenceTable prefs;
+	
+	public GeneticAlgorithm(PreferenceTable table)
+	{
+		this.prefs = table;
+		this.createPopulation(table.getStudents().size());
+	}
+	
+	public void createPopulation(int size)
+	{
+		for(int i = 0; i < size; i++)
+		{
+			CandidateSolution sol = new CandidateSolution(prefs);
+			sol.recalcProjectCount();
+			sol.calcTotalEnergy();
+			int energy = sol.getEnergy();
+			population.put(energy, sol);
+			pop.add(sol);
+		}
+	}
+	
+	public void createChild()
+	{
+		CandidateSolution child = new CandidateSolution(null);
+		
+		int index1 = RND.nextInt(population.size());
+		int index2 = RND.nextInt(population.size());
+				
+		CandidateSolution sol1 = pop.get(index1);
+		CandidateSolution sol2 = pop.get(index2);
+		
+		HashMap<String, CandidateAssignment> map1 = sol1.getMap();
+		HashMap<String, CandidateAssignment> map2 = sol2.getMap();
+		ArrayList<StudentEntry> students = prefs.getStudents();
+		
+		for(int i = 0; i < students.size(); i++)
+		{
+			String name = students.get(i).getName();
+			
+			CandidateAssignment cand1 = map1.get(name);
+			CandidateAssignment cand2 = map2.get(name);
+			
+			int choice = RND.nextInt(1);
+			
+			if(choice == 0){child.addAssignment(cand1);}
+			if(choice == 1){child.addAssignment(cand2);}
+		}
+		
+		child.recalcProjectCount();
+		child.calcTotalEnergy();
+		int energy = child.getEnergy();
+		population.put(energy, child);
+		pop.add(child);
+	}
+	
+	public void mate()
+	{
+		for(int i = 0; i < 1000; i++)
+		{
+			for(int j = 0; j < 50; j++)
+			{
+				this.createChild(); // x times
+			}
+			
+			List sortedKeys=new ArrayList(population.keySet());
+			Collections.sort(sortedKeys);
+			Collections.reverse(sortedKeys);
+			
+			// need to figure out a way of sorting through the population before killing the bottom half 
+			
+		}
+		
+		//sort
+		//kill
+		//repeat Y times
+		
+	}
+
+}
