@@ -17,6 +17,13 @@ public class Test {
 		
 		System.out.println("\n"+best.toString()+"\n");
 		
+		//////////////////////////////////////////////////
+		
+		GeneticAlgorithm GA = new GeneticAlgorithm(prefs);
+		GA.mate();
+		
+		//////////////////////////////////////////////////
+		
 		int choice = 0;
 		
 		while(choice != 1)
