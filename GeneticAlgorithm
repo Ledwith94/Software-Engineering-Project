@@ -63,27 +63,37 @@ public class GeneticAlgorithm {
 		pop.add(child);
 	}
 	
-	public void mate()
+	public void mutate()
 	{
-		int threshold = 1500;					// threshold to cut energies above this out
+		CandidateSolution mutation = new CandidateSolution(prefs);
+		mutation.recalcProjectCount();
+		mutation.calcTotalEnergy();
 		
-		for(int i = 0; i < 1000; i++)
+		this.population.put(mutation.getEnergy(), mutation);
+		//System.out.println("\t\t\tAdding Mutation");
+	}
+	
+	public CandidateSolution mate()
+	{
+		System.out.println("Starting Genetic Algorithm: ");
+		
+		int bestEnergy = 10000;
+		CandidateSolution bestSolution = new CandidateSolution(null);
+		
+		int threshold = 1500;									// threshold to cut energies above this out
+		
+		for(int i = 0; i < 5000; i++)
 		{
-			int total = 0;
-			int average = 0;
-			
+			if(i != 0 && i%250 == 0) {System.out.println("\t"+ i + " moves");}
+						
+			int mutate = RND.nextInt(50);
 			for(int j = 0; j < 50; j++)
-				{this.createChild();} 														// make 50 children
-
-			for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// get the total energy of all population
-				{total += entry.getKey();}													// add energy to total
-			
-			average = total / this.population.size();										// get average energy
-			System.out.println("Average = " + average);
-			
+				{if(j == mutate){mutate();}
+				else {this.createChild();} }												// make 50 children
+						
 			HashMap<Integer, CandidateSolution> newPop = new HashMap<Integer, CandidateSolution>();
 			
-			for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// copy all solutions with energy below theshold
+			for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// copy all solutions with energy below threshold
 			{				
 				if(entry.getKey() < threshold)
 					{newPop.put(entry.getKey(), entry.getValue());}							// add to new population
@@ -91,17 +101,24 @@ public class GeneticAlgorithm {
 			
 			this.population = newPop;														// update current population
 			
-			if(newPop.size() > 50 && threshold > 300){threshold -= 100; System.out.println("\t\t\tLowering threshold to: "+ threshold + " Pop size = " + newPop.size());}
+			if(newPop.size() > 50 && threshold > 300){threshold -= 100;}// System.out.println("\t\t\tLowering threshold to: "+ threshold + " Pop size = " + newPop.size());}
 			// this is to gradually lower the threshold to improve average energy
-			
-			// need to figure out a way of sorting through the population before killing the bottom half 
 		}
 		
-		for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// print remaining solution energies after everything
+		System.out.println("");
+		
+		for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// get best energy from the remaining solutions
 		{
 			int energy = entry.getKey();
-			System.out.println("remaining: " + energy);
+			if(energy < bestEnergy)
+				{bestSolution = this.population.get(energy);
+				 bestEnergy = energy;
+				}
 		}
+		
+		System.out.println("Best Energy Generated with Genetic Algorithm is: "+bestEnergy);
+		
+		return bestSolution;			// return best solution
 		
 	}
 
