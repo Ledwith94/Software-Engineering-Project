@@ -1,5 +1,4 @@
 import java.io.IOException;
-
 import javax.swing.JOptionPane;
 
 
@@ -10,35 +9,50 @@ public class Test {
 		PreferenceTable prefs = new PreferenceTable("src/data.tsv");
 		prefs.fillPreferencesOfAll(10);
 		
-		CandidateSolution best = new CandidateSolution(prefs);		// initialize solution
+		CandidateSolution best = new CandidateSolution(prefs);				// initialize a random solution
 		best.calcTotalEnergy();
 		
-		System.out.println("\nBest solution Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");		
-		
-		System.out.println("\n"+best.toString()+"\n");
-		
-		//////////////////////////////////////////////////
-		
-		GeneticAlgorithm GA = new GeneticAlgorithm(prefs);
-		best = GA.mate();
-		
-		//////////////////////////////////////////////////
-		
+		System.out.println("\nInitial solution Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");		
+				
+		int cont = 0;
+		int SAchoice = 0;
 		int choice = 0;
 		
-		while(choice != 1)
-		{
-			best.SimulatedAnnealing();
-		
-			System.out.println("\nBest Solution Energy generated = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+		while(cont != 1)
+		{		
+			String[] options = new String[] {"Genetic Algorithm", "Simulated Annealing"};
+		    int picked = JOptionPane.showOptionDialog(null, "Select Genetic Algorithm or Simulated Annealing", "Pick what method you wish to use",
+		        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+		        null, options, options[0]);
 			
-			choice = JOptionPane.showConfirmDialog(null,
-					"Run Simulated Annealing again ?", "Do you want to run again ?", JOptionPane.YES_NO_OPTION);
-
-			if(choice == 1){break;}
-		}
+			if(picked == 0)
+			{
+				GeneticAlgorithm GA = new GeneticAlgorithm(prefs);
+				best = GA.mate();
+				System.out.println("\n\n\tThe resulting solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+			}
+			
+			else if(picked == 1)
+			{
+				while(SAchoice != 1)
+				{
+					best.SimulatedAnnealing();
+				
+					System.out.println("\nBest Solution Energy generated = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+					
+					SAchoice = JOptionPane.showConfirmDialog(null,
+							"Run Simulated Annealing again ?", "Do you want to run again ?", JOptionPane.YES_NO_OPTION);
 		
-		System.out.println("\n\n\tThe resulting solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
+					if(SAchoice == 1){break;}
+				}
+			}
+			
+			else
+				{System.out.println("Error, try again");}
+			
+			cont = JOptionPane.showConfirmDialog(null,
+					"Run Simulated Annealing or Genetic Algorithm again ?", "Do you want to run Simulated Annealing or Genetic Algorithm again ?", JOptionPane.YES_NO_OPTION);
+		}
 		
 		if(best.getProjAllocEnergy() != 0)
 		{
@@ -50,52 +64,10 @@ public class Test {
 		
 		System.out.println("\n\n\tThe Overall Best solution was Energy = "+best.getEnergy()+"\nThis solution has "+best.getProjAllocEnergy()+" allocation energy and "+(best.getEnergy()-best.getProjAllocEnergy())+" choice energy\n");
 		
+		System.out.println("Generating results.tsv in the same folder as the program ...");
+		
+		best.toFile();
+		
 		System.exit(0);
 	}
 }
-
-//  Previous main tests
-//	
-//	StudentEntry test = prefs.students[0];
-//	
-//	System.out.println("Name: " + test.getName());
-//	System.out.println("Pre-arranged: " + test.getPreArranged());
-//	System.out.println("Preferences: \n" + test.getPrefs());
-//	System.out.println("Stated Preferences: " + test.getStatedPrefs()+"\n");
-
-//ArrayList<StudentEntry> list = getAllStudentEntries();
-// System.out.println(list.toString());
-
-//StudentEntry student = prefs.getEntryFor("Simone de Beauvoir");					// getStudentEntry
-//
-//if(student == null)
-//	{System.out.println("Error, student entry null");}
-//else
-//	{System.out.println("\ngetEntryFor success for "+student);}
-//
-//student = prefs.getEntryFor("Red Sonja");
-//
-//if(student == null)
-//	{System.out.println("Error, student entry null");}
-//else
-//	{System.out.println("\ngetEntryFor success for "+student);}
-
-
-
-//student = prefs.getEntryFor("Simone de Beauvoir");					// getStudentEntry
-//
-//if(student == null)
-//	{System.out.println("Error, student entry null");}
-//else
-//	{System.out.println("\ngetEntryFor success for "+student);}
-//
-//student = prefs.getEntryFor("Red Sonja");
-//
-//if(student == null)
-//	{System.out.println("Error, student entry null");}
-//else
-//	{System.out.println("\ngetEntryFor success for "+student);}
-//
-////System.out.println("\n\n Hashtable: "+table.toString());
-//		
-//java.util.Collections.sort(prefs.choices);										// Alphabetize list of choices
