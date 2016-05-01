@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,9 @@ public class CandidateSolution
 		 		}
 		 	}
 		}
+	
+	public HashMap<String, CandidateAssignment> getMap()
+		{return this.map;}
 	
 	public void addAssignment(CandidateAssignment cand)
 		{this.map.put(cand.getStudentEntry().getName(), cand);}						// add cand assignment
@@ -105,7 +110,7 @@ public class CandidateSolution
 	
 	public void SimulatedAnnealing()
 		{		
-			System.out.print("\nBeginning Simulated Annealing\n\tRandom Moves Made:\n0 ");
+			System.out.print("\nBeginning Simulated Annealing for 1,000,000 moves\n\tRandom Moves Made:\n0 ");
 
 			for(int i = 0; i < 1000000; i++)
 			{
@@ -179,4 +184,43 @@ public class CandidateSolution
 			{s += entry.getValue().toString();}
 		return s;
 	}
+	
+	public void toFile()
+	{
+		try
+		{
+		    FileWriter writer = new FileWriter("results.tsv");
+		    
+		    writer.append("Student Name");
+		    writer.append("\t");
+		    writer.append("Assigned Project");
+		    writer.append("\t");
+		    writer.append("Choice Number");
+		    writer.append("\n");
+		    
+			for (Entry<String, CandidateAssignment> entry : map.entrySet())				// sort through CandidateAssignment map
+			{
+				CandidateAssignment cand = entry.getValue();
+				writer.append(cand.getStudentEntry().getName());
+				writer.append("\t");
+				writer.append(cand.getAssignedProject());
+				writer.append("\t");
+				int index = cand.getStudentEntry().getIndexOfProject(cand.getAssignedProject());
+				String indexAsString = Integer.toString(index);
+				writer.append(indexAsString);
+				writer.append("\n");
+			}
+				
+		    //generate whatever data you want
+				
+		    writer.flush();
+		    writer.close();
+		}
+		
+		catch(IOException e)
+		{
+		     e.printStackTrace();
+		}
+	 }
+	
 }
