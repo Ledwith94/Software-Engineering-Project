@@ -75,7 +75,7 @@ public class GeneticAlgorithm {
 	
 	public CandidateSolution mate()
 	{
-		System.out.println("Starting Genetic Algorithm: ");
+		System.out.println("Starting Genetic Algorithm for 5000 generations: ");
 		
 		int bestEnergy = 10000;
 		CandidateSolution bestSolution = new CandidateSolution(null);
@@ -105,7 +105,7 @@ public class GeneticAlgorithm {
 			// this is to gradually lower the threshold to improve average energy
 		}
 		
-		System.out.println("");
+		System.out.println("\t 5000 moves");
 		
 		for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// get best energy from the remaining solutions
 		{
