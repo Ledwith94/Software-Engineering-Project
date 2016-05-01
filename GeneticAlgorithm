@@ -1,0 +1,125 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.Map.Entry;
+
+public class GeneticAlgorithm {
+
+	private static Random RND = new Random();
+	private ArrayList<CandidateSolution> pop = new ArrayList<CandidateSolution>();
+	private HashMap<Integer, CandidateSolution> population = new HashMap<Integer, CandidateSolution>();
+	private PreferenceTable prefs;
+	
+	public GeneticAlgorithm(PreferenceTable table)
+	{
+		this.prefs = table;
+		this.createPopulation(table.getStudents().size());
+	}
+	
+	public void createPopulation(int size)
+	{
+		for(int i = 0; i < size; i++)
+		{
+			CandidateSolution sol = new CandidateSolution(prefs);
+			sol.recalcProjectCount();
+			sol.calcTotalEnergy();
+			int energy = sol.getEnergy();
+			population.put(energy, sol);
+			pop.add(sol);
+		}
+	}
+	
+	public void createChild()
+	{
+		CandidateSolution child = new CandidateSolution(null);
+		
+		int index1 = RND.nextInt(population.size());
+		int index2 = RND.nextInt(population.size());
+				
+		CandidateSolution sol1 = pop.get(index1);
+		CandidateSolution sol2 = pop.get(index2);
+		
+		HashMap<String, CandidateAssignment> map1 = sol1.getMap();
+		HashMap<String, CandidateAssignment> map2 = sol2.getMap();
+		ArrayList<StudentEntry> students = prefs.getStudents();
+		
+		for(int i = 0; i < students.size()-1; i++)
+		{
+			String name = students.get(i).getName();
+						
+			CandidateAssignment cand1 = map1.get(name);
+			CandidateAssignment cand2 = map2.get(name);
+						
+			int choice = RND.nextInt(2);
+			
+			if(choice == 0){child.addAssignment(cand1);}
+			if(choice == 1){child.addAssignment(cand2);}
+		}
+		
+		child.recalcProjectCount();
+		child.calcTotalEnergy();
+		int energy = child.getEnergy();
+		population.put(energy, child);
+		pop.add(child);
+	}
+	
+	public void mutate()
+	{
+		CandidateSolution mutation = new CandidateSolution(prefs);
+		mutation.recalcProjectCount();
+		mutation.calcTotalEnergy();
+		
+		this.population.put(mutation.getEnergy(), mutation);
+		//System.out.println("\t\t\tAdding Mutation");
+	}
+	
+	public CandidateSolution mate()
+	{
+		System.out.println("Starting Genetic Algorithm for 5000 generations: ");
+		
+		int bestEnergy = 10000;
+		CandidateSolution bestSolution = new CandidateSolution(null);
+		
+		int threshold = 1500;									// threshold to cut energies above this out
+		
+		for(int i = 0; i < 5000; i++)
+		{
+			if(i != 0 && i%250 == 0) {System.out.println("\t"+ i + " moves");}
+						
+			int mutate = RND.nextInt(50);
+			for(int j = 0; j < 50; j++)
+				{if(j == mutate){mutate();}
+				else {this.createChild();} }												// make 50 children
+						
+			HashMap<Integer, CandidateSolution> newPop = new HashMap<Integer, CandidateSolution>();
+			
+			for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// copy all solutions with energy below threshold
+			{				
+				if(entry.getKey() < threshold)
+					{newPop.put(entry.getKey(), entry.getValue());}							// add to new population
+			}		
+			
+			this.population = newPop;														// update current population
+			
+			if(newPop.size() > 50 && threshold > 300){threshold -= 100;}// System.out.println("\t\t\tLowering threshold to: "+ threshold + " Pop size = " + newPop.size());}
+			// this is to gradually lower the threshold to improve average energy
+		}
+		
+		System.out.println("\t 5000 moves");
+		
+		for (Entry<Integer, CandidateSolution> entry : this.population.entrySet())		// get best energy from the remaining solutions
+		{
+			int energy = entry.getKey();
+			if(energy < bestEnergy)
+				{bestSolution = this.population.get(energy);
+				 bestEnergy = energy;
+				}
+		}
+		
+		System.out.println("Best Energy Generated with Genetic Algorithm is: "+bestEnergy);
+		
+		return bestSolution;			// return best solution
+		
+	}
+
+}
